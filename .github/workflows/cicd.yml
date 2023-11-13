@@ -16,7 +16,7 @@ jobs:
       - name: Checkout Repo
         uses: actions/checkout@master
         with:
-          ref: main
+          ref: master
 
       - name: Setup Node
         uses: actions/setup-node@v2
