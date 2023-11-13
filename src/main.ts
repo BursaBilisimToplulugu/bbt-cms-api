@@ -18,7 +18,8 @@ async function bootstrap() {
 
   app.useGlobalInterceptors(new TransformInterceptor());
   app.useGlobalPipes(new ValidationPipe());
-
-  await app.listen(3000);
+  const port = process.env.PORT || 8080;
+  console.log(port);
+  await app.listen(port);
 }
 bootstrap();
