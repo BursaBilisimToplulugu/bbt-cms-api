@@ -1,12 +1,11 @@
 import { Module } from '@nestjs/common';
+import { ConfigModule } from '@nestjs/config';
+import { TypeOrmModule } from '@nestjs/typeorm';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
-import { UsersModule } from './users/users.module';
-import { TypeOrmModule } from '@nestjs/typeorm';
-import { ConfigModule } from '@nestjs/config';
-import { PlacesModule } from './places/places.module';
 import { PlacepropertiesModule } from './placeproperties/placeproperties.module';
-
+import { PlacesModule } from './places/places.module';
+import { UsersModule } from './users/users.module';
 
 @Module({
   imports: [

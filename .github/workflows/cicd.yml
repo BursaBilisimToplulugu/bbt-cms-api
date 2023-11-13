@@ -1,0 +1,64 @@
+name: Deploy to Google Cloud Run
+
+on:
+  push:
+    branches:
+      - 'master'
+
+jobs:
+  deploy:
+    name: CI/CD workflow
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./
+    steps:
+      - name: Checkout Repo
+        uses: actions/checkout@master
+        with:
+          ref: main
+
+      - name: Setup Node
+        uses: actions/setup-node@v2
+        with:
+          node-version: 16
+
+      - name: 'Authenticate to Google Cloud'
+        uses: google-github-actions/auth@v0
+        with:
+          credentials_json: ${{ secrets.GOOGLE_APPLICATION_CREDENTIALS }}
+
+      - run: echo "${{ secrets.ENV_FILE }}" > .env
+      - run: npx dotenv-to-yaml .env .env.yaml
+      - run: echo "$(cat .env.yaml)"
+
+      - run: echo "IMAGE_NAME=europe-west1-docker.pkg.dev/bbt-cms/bbt-maps/api" >> $GITHUB_ENV
+
+      - name: Configure Docker
+        run: gcloud auth configure-docker europe-west3-docker.pkg.dev
+
+      - name: Build Docker image
+        run: |
+          echo "Building Docker image..."
+          docker build -t $IMAGE_NAME .
+
+      - name: Push Docker image to Google Artifact Registry
+        run: |
+          echo "Pushing Docker image to Google Artifact Registry..."
+          docker push $IMAGE_NAME
+
+      - name: Deploy to Google Cloud Run
+        run: |
+          gcloud run deploy ${{ github.event.repository.name }} \
+            --image $IMAGE_NAME \
+            --platform managed \
+            --region europe-west3 \
+            --env-vars-file .env.yaml \
+            --allow-unauthenticated
+
+      - name: Set IAM policy for Cloud Run service
+        run: |
+          gcloud run services add-iam-policy-binding ${{ github.event.repository.name }} \
+            --region=europe-west3 \
+            --member="allUsers" \
+            --role="roles/run.invoker"
