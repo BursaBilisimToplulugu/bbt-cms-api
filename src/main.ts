@@ -12,6 +12,15 @@ async function bootstrap() {
     .setDescription('The Open Source API Document')
     .setVersion('1.0')
     .addTag('BBT')
+    .addBearerAuth(
+      {
+        type: 'http',
+        in: 'header',
+        scheme: 'Bearer',
+        name: 'Authorization',
+      },
+      'access_token',
+    )
     .build();
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('api', app, document);

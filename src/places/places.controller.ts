@@ -7,7 +7,10 @@ import {
   ParseUUIDPipe,
   Post,
   Put,
+  UseGuards,
 } from '@nestjs/common';
+import { ApiBearerAuth } from '@nestjs/swagger';
+import { JwtAuthGuard } from 'src/auth/guards/jwt.guard';
 import { CreatePlaceDto } from './dto/create-place.dto';
 import { UpdatePlaceDto } from './dto/update-place.dto';
 import { Place } from './entities/place.entity';
@@ -23,6 +26,8 @@ export class PlacesController {
   }
 
   @Get()
+  @ApiBearerAuth('access_token')
+  @UseGuards(JwtAuthGuard)
   findAll() {
     return this.placesService.findAll();
   }

@@ -6,6 +6,7 @@ import { AppService } from './app.service';
 import { PlacepropertiesModule } from './placeproperties/placeproperties.module';
 import { PlacesModule } from './places/places.module';
 import { UsersModule } from './users/users.module';
+import { AuthModule } from './auth/auth.module';
 
 @Module({
   imports: [
@@ -23,6 +24,7 @@ import { UsersModule } from './users/users.module';
     }),
     PlacesModule,
     PlacepropertiesModule,
+    AuthModule,
   ],
   controllers: [AppController],
   providers: [AppService],
