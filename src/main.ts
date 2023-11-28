@@ -49,7 +49,6 @@ async function bootstrap() {
       },
     }),
   );
-
   const config = new DocumentBuilder()
     .setTitle('BBT Open Source Project')
     .setDescription('The Open Source API Document')
