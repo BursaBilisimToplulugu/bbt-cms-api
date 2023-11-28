@@ -3,10 +3,10 @@ import { ConfigModule } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
+import { AuthModule } from './auth/auth.module';
 import { PlacepropertiesModule } from './placeproperties/placeproperties.module';
 import { PlacesModule } from './places/places.module';
 import { UsersModule } from './users/users.module';
-import { AuthModule } from './auth/auth.module';
 
 @Module({
   imports: [
@@ -21,6 +21,7 @@ import { AuthModule } from './auth/auth.module';
       database: process.env.PG_DB,
       entities: [__dirname + '/**/*.entity{.ts,.js}'],
       synchronize: true,
+      // dropSchema: true,
     }),
     PlacesModule,
     PlacepropertiesModule,

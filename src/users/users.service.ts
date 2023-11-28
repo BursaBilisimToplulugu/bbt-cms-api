@@ -1,8 +1,9 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { encrypt } from 'src/common/utils/crypto';
+import * as bcrypt from 'bcrypt';
+import * as jwt from 'jsonwebtoken';
 import { Repository } from 'typeorm';
-import { User } from './user.entity';
+import { User } from './entities/User.entity';
 
 @Injectable()
 export class UserService {
@@ -25,7 +26,8 @@ export class UserService {
   }
 
   async create(user: Partial<User>): Promise<User> {
-    const cryptedPassword = await encrypt(user.password);
+    const cryptedPassword = await bcrypt.hash(user.password, 10);
+    delete user.password;
     const newuser = this.userRepository.create({
       password: cryptedPassword,
       ...user,
@@ -40,5 +42,18 @@ export class UserService {
 
   async delete(id: string): Promise<void> {
     await this.userRepository.delete(id);
+  }
+  async getProfileFromEmail(email: string) {
+    const user = await this.userRepository.findOne({
+      where: { email },
+    });
+    delete user.password;
+    delete user.access_token;
+    return user;
+  }
+
+  async getProfileFromToken(token: string) {
+    const decodedJwt = jwt.decode(token, { json: true });
+    return await this.getProfileFromEmail(decodedJwt.email);
   }
 }

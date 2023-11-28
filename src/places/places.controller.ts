@@ -9,8 +9,7 @@ import {
   Put,
   UseGuards,
 } from '@nestjs/common';
-import { ApiBearerAuth } from '@nestjs/swagger';
-import { JwtAuthGuard } from 'src/auth/guards/jwt.guard';
+import { AuthGuard } from 'src/auth/guards/Auth.guard';
 import { CreatePlaceDto } from './dto/create-place.dto';
 import { UpdatePlaceDto } from './dto/update-place.dto';
 import { Place } from './entities/place.entity';
@@ -26,8 +25,7 @@ export class PlacesController {
   }
 
   @Get()
-  @ApiBearerAuth('access_token')
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(AuthGuard)
   findAll() {
     return this.placesService.findAll();
   }

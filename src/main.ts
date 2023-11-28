@@ -1,31 +1,65 @@
-import { ValidationPipe } from '@nestjs/common';
-import { NestFactory } from '@nestjs/core';
+import { BadRequestException, ValidationPipe } from '@nestjs/common';
+import { NestFactory, Reflector } from '@nestjs/core';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
+import * as cookieParser from 'cookie-parser';
 import { AppModule } from './app.module';
-import { TransformInterceptor } from './common/interceptors/transform.interceptor';
+import { TransformInterceptor } from './common/interceptors/Transform.interceptor';
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
+  const app = await NestFactory.create(AppModule, {
+    cors: true,
+  });
+  app.use(cookieParser());
+  app.useGlobalPipes(
+    new ValidationPipe({
+      transform: true,
+      whitelist: true,
+      forbidNonWhitelisted: false,
+      exceptionFactory(errors) {
+        const formatErrors = (validationErrors, parentPath = '') => {
+          let formattedErrors = [];
+
+          validationErrors.forEach((error) => {
+            const isArrayItem = !isNaN(Number(error.property));
+            const currentPath = isArrayItem
+              ? `${parentPath}.${error.property}`
+              : parentPath
+              ? `${parentPath}.${error.property}`
+              : error.property;
+
+            if (error.constraints) {
+              formattedErrors.push({
+                field: currentPath,
+                message: error.constraints[Object.keys(error.constraints)[0]],
+              });
+            }
+
+            if (error.children && error.children.length > 0) {
+              const childErrors = formatErrors(error.children, currentPath); // Recursive call
+              formattedErrors = formattedErrors.concat(childErrors);
+            }
+          });
+
+          return formattedErrors;
+        };
+
+        const result = formatErrors(errors);
+
+        return new BadRequestException(result);
+      },
+    }),
+  );
 
   const config = new DocumentBuilder()
     .setTitle('BBT Open Source Project')
     .setDescription('The Open Source API Document')
     .setVersion('1.0')
     .addTag('BBT')
-    .addBearerAuth(
-      {
-        type: 'http',
-        in: 'header',
-        scheme: 'Bearer',
-        name: 'Authorization',
-      },
-      'access_token',
-    )
     .build();
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('api', app, document);
 
-  app.useGlobalInterceptors(new TransformInterceptor());
+  app.useGlobalInterceptors(new TransformInterceptor(new Reflector()));
   app.useGlobalPipes(new ValidationPipe());
   const port = process.env.PORT || 8080;
   console.log(port);
