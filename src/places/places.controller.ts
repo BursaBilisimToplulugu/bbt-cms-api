@@ -2,13 +2,19 @@ import {
   Body,
   Controller,
   Delete,
+  FileTypeValidator,
   Get,
   Param,
+  ParseFilePipe,
   ParseUUIDPipe,
   Post,
   Put,
+  UploadedFiles,
   UseGuards,
+  UseInterceptors,
 } from '@nestjs/common';
+import { FilesInterceptor } from '@nestjs/platform-express';
+import { ApiBody, ApiConsumes, ApiTags } from '@nestjs/swagger';
 import { AuthGuard } from 'src/auth/guards/Auth.guard';
 import { RoleGuard } from 'src/auth/guards/Role.guard';
 import { CreatePlaceDto } from './dto/create-place.dto';
@@ -17,12 +23,50 @@ import { Place } from './entities/place.entity';
 import { PlacesService } from './places.service';
 
 @Controller('places')
+@ApiTags('Places')
 export class PlacesController {
   constructor(private readonly placesService: PlacesService) {}
 
+  @ApiConsumes('multipart/form-data')
+  @ApiBody({
+    schema: {
+      type: 'object',
+      required: ['name', 'longitude', 'latitude', 'open_address', 'photos'],
+      properties: {
+        name: {
+          type: 'string',
+        },
+        longitude: {
+          type: 'number',
+        },
+        latitude: {
+          type: 'number',
+        },
+        open_address: {
+          type: 'string',
+        },
+        photos: {
+          type: 'array',
+          items: {
+            type: 'string',
+            format: 'binary',
+          },
+        },
+      },
+    },
+  })
+  @UseInterceptors(FilesInterceptor('photos'))
   @Post()
-  create(@Body() createPlaceDto: CreatePlaceDto) {
-    return this.placesService.create(createPlaceDto);
+  async create(
+    @UploadedFiles(
+      new ParseFilePipe({
+        validators: [new FileTypeValidator({ fileType: 'image/*' })],
+      }),
+    )
+    photos: Express.Multer.File[],
+    @Body() createPlaceDto: CreatePlaceDto,
+  ) {
+    return await this.placesService.create(createPlaceDto, photos);
   }
 
   @Get()

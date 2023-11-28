@@ -1,5 +1,6 @@
 import { DownloadResponse, Storage } from '@google-cloud/storage';
 import { Injectable } from '@nestjs/common';
+import sharp from 'sharp';
 import StorageConfig from './storage.config';
 import { StorageFile } from './types/storage';
 
@@ -41,10 +42,14 @@ export class StorageService {
         await new Promise((resolve, reject) => {
           stream.on('finish', resolve);
           stream.on('error', reject);
-          stream.end(media);
+          sharp(media)
+            .webp({ quality: 80 })
+            .toBuffer()
+            .then((data) => {
+              stream.end(data);
+            });
         });
 
-        // Metadata is set after the file upload is confirmed successful.
         await file.setMetadata({
           metadata: object,
         });

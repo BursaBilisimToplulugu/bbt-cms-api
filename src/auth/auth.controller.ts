@@ -47,6 +47,7 @@ export class AuthController {
 
   @Delete('/logout')
   @UseInterceptors(GetUserInterceptor)
+  @ResponseMessage('Başarıyla çıkış yapıldı')
   async logout(@Res({ passthrough: true }) res: Response, @Req() req: Request) {
     const user = req.user as User;
     await this.authService.logout(user.id);
