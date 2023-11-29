@@ -9,7 +9,7 @@ import {
   Put,
   UseGuards,
 } from '@nestjs/common';
-import { ApiTags } from '@nestjs/swagger';
+import { ApiOperation, ApiTags } from '@nestjs/swagger';
 import { AuthGuard } from 'src/auth/guards/Auth.guard';
 import { RoleGuard } from 'src/auth/guards/Role.guard';
 import { User } from './entities/User.entity';
@@ -21,6 +21,7 @@ export class UsersController {
   constructor(private readonly usersService: UserService) {}
 
   //get all users
+  @ApiOperation({ summary: 'Admin Only' })
   @Get()
   @UseGuards(AuthGuard, RoleGuard)
   async findAll(): Promise<User[]> {
@@ -39,6 +40,7 @@ export class UsersController {
 
   //create user
   @Post()
+  @ApiOperation({ summary: 'Admin Only' })
   @UseGuards(AuthGuard, RoleGuard)
   async create(@Body() user: User): Promise<User> {
     return this.usersService.create(user);
@@ -53,6 +55,7 @@ export class UsersController {
 
   //delete user
   @Delete(':id')
+  @ApiOperation({ summary: 'Admin Only' })
   @UseGuards(AuthGuard, RoleGuard)
   async delete(@Param('id') id: string): Promise<any> {
     //handle error if user does not exist

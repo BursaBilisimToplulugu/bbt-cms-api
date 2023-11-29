@@ -14,7 +14,7 @@ import {
   UseInterceptors,
 } from '@nestjs/common';
 import { FilesInterceptor } from '@nestjs/platform-express';
-import { ApiBody, ApiConsumes, ApiTags } from '@nestjs/swagger';
+import { ApiBody, ApiConsumes, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { AuthGuard } from 'src/auth/guards/Auth.guard';
 import { RoleGuard } from 'src/auth/guards/Role.guard';
 import { CreatePlaceDto } from './dto/create-place.dto';
@@ -28,6 +28,7 @@ export class PlacesController {
   constructor(private readonly placesService: PlacesService) {}
 
   @ApiConsumes('multipart/form-data')
+  @ApiOperation({ summary: 'Admin Only' })
   @ApiBody({
     schema: {
       type: 'object',
@@ -81,6 +82,7 @@ export class PlacesController {
   }
 
   @Put(':id')
+  @ApiOperation({ summary: 'Admin Only' })
   @UseGuards(AuthGuard, RoleGuard)
   update(
     @Param('id', ParseUUIDPipe) id: string,
@@ -90,6 +92,7 @@ export class PlacesController {
   }
 
   @Delete(':id')
+  @ApiOperation({ summary: 'Admin Only' })
   @UseGuards(AuthGuard, RoleGuard)
   remove(@Param('id') id: Place['id']) {
     return this.placesService.remove(id);

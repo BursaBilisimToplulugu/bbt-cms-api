@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { ForbiddenException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import * as bcrypt from 'bcrypt';
 import * as jwt from 'jsonwebtoken';
@@ -36,6 +36,8 @@ export class UserService {
   }
 
   async update(id: string, user: Partial<User>): Promise<User> {
+    if (user.role !== 'admin' && user.id !== id)
+      throw new ForbiddenException('You can not update other users');
     await this.userRepository.update(id, user);
     return this.userRepository.findOne({ where: { id } });
   }
