@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   Injectable,
   NotFoundException,
   UnauthorizedException,
@@ -36,12 +37,26 @@ export class CommentService {
 
   async commentToPlace(payload: CommentDto, user: User) {
     const comment = this.commentRepository.create(payload);
+    const usersComment = await this.commentRepository.findOne({
+      where: { user: { id: user.id }, place: { id: payload.place_id } },
+    });
+    if (usersComment)
+      throw new BadRequestException('Bu mekana daha önce yorum yaptınız !');
     const place = await this.placeRepository.findOne({
       where: { id: payload.place_id },
+      relations: { comments: true },
     });
     if (!place) throw new NotFoundException('Böyle bir mekan yok !');
     comment.place = place;
     comment.user = user;
+    const allComments = [...place.comments, comment];
+    const placeRating =
+      allComments.reduce((acc, comment) => acc + comment.rating, 0) /
+      allComments.length;
+    place.rating = parseFloat(placeRating.toFixed(1));
+
+    this.placeRepository.save(place);
+
     return await this.commentRepository.save(comment);
   }
 

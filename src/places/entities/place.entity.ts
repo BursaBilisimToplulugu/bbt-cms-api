@@ -17,6 +17,9 @@ export class Place extends BaseEntity {
   @Column()
   open_address: string;
 
+  @Column({ nullable: true, type: 'float' })
+  rating: number;
+
   @OneToMany(() => Photo, (photo) => photo.place, { cascade: true })
   photos: Photo[];
 
