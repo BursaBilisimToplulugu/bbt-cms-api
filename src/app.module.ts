@@ -8,6 +8,7 @@ import { PlacesModule } from './places/places.module';
 import { StorageModule } from './storage/storage.module';
 import { User } from './users/entities/User.entity';
 import { UsersModule } from './users/users.module';
+import { CommentModule } from './comment/comment.module';
 
 @Module({
   imports: [
@@ -28,6 +29,7 @@ import { UsersModule } from './users/users.module';
     PlacesModule,
     AuthModule,
     StorageModule,
+    CommentModule,
   ],
   controllers: [AppController],
   providers: [AppService],

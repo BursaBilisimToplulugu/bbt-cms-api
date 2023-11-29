@@ -22,14 +22,16 @@ export class PlacesService {
     });
   }
 
-  findAll() {
-    return this.placeRepository.find({ relations: { photos: true } });
+  async findAll() {
+    return await this.placeRepository.find({
+      relations: { photos: true, comments: true },
+    });
   }
 
-  findOne(id: Place['id']) {
-    return this.placeRepository.findOne({
+  async findOne(id: Place['id']) {
+    return await this.placeRepository.findOne({
       where: { id },
-      relations: { photos: true },
+      relations: { photos: true, comments: true },
     });
   }
 

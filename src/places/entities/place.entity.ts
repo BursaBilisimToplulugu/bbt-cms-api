@@ -1,3 +1,4 @@
+import { Comment } from 'src/comment/entities/Comment.entity';
 import { BaseEntity } from 'src/common/entities/BaseEntity.entity';
 import { Column, Entity, OneToMany } from 'typeorm';
 import { Photo } from './Photo.entity';
@@ -18,4 +19,7 @@ export class Place extends BaseEntity {
 
   @OneToMany(() => Photo, (photo) => photo.place, { cascade: true })
   photos: Photo[];
+
+  @OneToMany(() => Comment, (comment) => comment.place, { cascade: true })
+  comments: Comment[];
 }

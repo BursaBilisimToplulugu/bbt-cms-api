@@ -47,12 +47,11 @@ export class UserService {
     const user = await this.userRepository.findOne({
       where: { email },
     });
-    delete user.password;
-    delete user.access_token;
     return user;
   }
 
   async getProfileFromToken(token: string) {
+    if (!token) return null;
     const decodedJwt = jwt.decode(token, { json: true });
     return await this.getProfileFromEmail(decodedJwt.email);
   }
