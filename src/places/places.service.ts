@@ -25,6 +25,7 @@ export class PlacesService {
   async findAll() {
     return await this.placeRepository.find({
       relations: { photos: true, comments: true },
+      order: { created_at: 'DESC' },
     });
   }
 

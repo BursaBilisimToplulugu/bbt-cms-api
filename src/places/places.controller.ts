@@ -57,6 +57,7 @@ export class PlacesController {
   })
   @UseInterceptors(FilesInterceptor('photos'))
   @Post()
+  @UseGuards(AuthGuard, RoleGuard)
   async create(
     @UploadedFiles(
       new ParseFilePipe({
@@ -70,7 +71,6 @@ export class PlacesController {
   }
 
   @Get()
-  @UseGuards(AuthGuard, RoleGuard)
   findAll() {
     return this.placesService.findAll();
   }
@@ -81,6 +81,7 @@ export class PlacesController {
   }
 
   @Put(':id')
+  @UseGuards(AuthGuard, RoleGuard)
   update(
     @Param('id', ParseUUIDPipe) id: string,
     @Body() updatePlaceDto: UpdatePlaceDto,
@@ -89,6 +90,7 @@ export class PlacesController {
   }
 
   @Delete(':id')
+  @UseGuards(AuthGuard, RoleGuard)
   remove(@Param('id') id: Place['id']) {
     return this.placesService.remove(id);
   }

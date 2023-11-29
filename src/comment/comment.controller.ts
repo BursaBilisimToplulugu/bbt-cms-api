@@ -37,6 +37,7 @@ export class CommentController {
   }
 
   @Post('/')
+  @UseGuards(AuthGuard)
   @UseInterceptors(GetUserInterceptor)
   @ResponseMessage('Yorum başarıyla eklendi')
   async commentToPlace(@Body() payload: CommentDto, @Req() req: Request) {

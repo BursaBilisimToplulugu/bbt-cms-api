@@ -26,6 +26,7 @@ export class CommentService {
     const comments = await this.commentRepository.find({
       where: { place: { id: place_id } },
       relations: { user: true },
+      order: { created_at: 'DESC', rating: 'ASC' },
     });
     return comments.map((comment) => {
       if (user && comment.user.id === user.id) {
