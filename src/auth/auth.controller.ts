@@ -38,8 +38,8 @@ export class AuthController {
     const { access_token, ...user } = await this.authService.login(loginDto);
     res.cookie('access_token', access_token, {
       httpOnly: true,
-      secure: false,
-      sameSite: 'lax',
+      secure: true,
+      sameSite: 'none',
       expires: new Date(Date.now() + 1 * 24 * 60 * 1000),
     });
     return user;
