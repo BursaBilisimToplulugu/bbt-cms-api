@@ -10,7 +10,7 @@ import {
   UseGuards,
   UseInterceptors,
 } from '@nestjs/common';
-import { ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { Request } from 'express';
 import { AuthGuard } from 'src/auth/guards/Auth.guard';
 import { ResponseMessage } from 'src/common/decorators/ResponseMessage.decorator';
@@ -38,6 +38,7 @@ export class CommentController {
 
   @Post('/')
   @UseGuards(AuthGuard)
+  @ApiBearerAuth('access_token')
   @UseInterceptors(GetUserInterceptor)
   @ResponseMessage('Yorum başarıyla eklendi')
   async commentToPlace(@Body() payload: CommentDto, @Req() req: Request) {
@@ -47,6 +48,7 @@ export class CommentController {
   @Delete(':id')
   @UseGuards(AuthGuard)
   @UseInterceptors(GetUserInterceptor)
+  @ApiBearerAuth('access_token')
   @ResponseMessage('Yorum başarıyla silindi')
   async deleteComment(
     @Param('id', ParseUUIDPipe) id: string,

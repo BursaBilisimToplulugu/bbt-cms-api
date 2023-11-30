@@ -14,7 +14,13 @@ import {
   UseInterceptors,
 } from '@nestjs/common';
 import { FilesInterceptor } from '@nestjs/platform-express';
-import { ApiBody, ApiConsumes, ApiOperation, ApiTags } from '@nestjs/swagger';
+import {
+  ApiBearerAuth,
+  ApiBody,
+  ApiConsumes,
+  ApiOperation,
+  ApiTags,
+} from '@nestjs/swagger';
 import { AuthGuard } from 'src/auth/guards/Auth.guard';
 import { RoleGuard } from 'src/auth/guards/Role.guard';
 import { CreatePlaceDto } from './dto/create-place.dto';
@@ -59,6 +65,7 @@ export class PlacesController {
   @UseInterceptors(FilesInterceptor('photos'))
   @Post()
   @UseGuards(AuthGuard, RoleGuard)
+  @ApiBearerAuth('access_token')
   async create(
     @UploadedFiles(
       new ParseFilePipe({
@@ -83,6 +90,7 @@ export class PlacesController {
 
   @Put(':id')
   @ApiOperation({ summary: 'Admin Only' })
+  @ApiBearerAuth('access_token')
   @UseGuards(AuthGuard, RoleGuard)
   update(
     @Param('id', ParseUUIDPipe) id: string,
@@ -94,6 +102,7 @@ export class PlacesController {
   @Delete(':id')
   @ApiOperation({ summary: 'Admin Only' })
   @UseGuards(AuthGuard, RoleGuard)
+  @ApiBearerAuth('access_token')
   remove(@Param('id') id: Place['id']) {
     return this.placesService.remove(id);
   }

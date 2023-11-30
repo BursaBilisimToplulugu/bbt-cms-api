@@ -9,7 +9,7 @@ import {
   Put,
   UseGuards,
 } from '@nestjs/common';
-import { ApiOperation, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { AuthGuard } from 'src/auth/guards/Auth.guard';
 import { RoleGuard } from 'src/auth/guards/Role.guard';
 import { User } from './entities/User.entity';
@@ -24,6 +24,7 @@ export class UsersController {
   @ApiOperation({ summary: 'Admin Only' })
   @Get()
   @UseGuards(AuthGuard, RoleGuard)
+  @ApiBearerAuth('access_token')
   async findAll(): Promise<User[]> {
     return this.usersService.findAll();
   }
@@ -42,6 +43,7 @@ export class UsersController {
   @Post()
   @ApiOperation({ summary: 'Admin Only' })
   @UseGuards(AuthGuard, RoleGuard)
+  @ApiBearerAuth('access_token')
   async create(@Body() user: User): Promise<User> {
     return this.usersService.create(user);
   }
@@ -49,6 +51,7 @@ export class UsersController {
   //update user
   @Put(':id')
   @UseGuards(AuthGuard, RoleGuard)
+  @ApiBearerAuth('access_token')
   async update(@Param('id') id: string, @Body() user: User): Promise<any> {
     return this.usersService.update(id, user);
   }
@@ -57,6 +60,7 @@ export class UsersController {
   @Delete(':id')
   @ApiOperation({ summary: 'Admin Only' })
   @UseGuards(AuthGuard, RoleGuard)
+  @ApiBearerAuth('access_token')
   async delete(@Param('id') id: string): Promise<any> {
     //handle error if user does not exist
     const user = await this.usersService.findOne(id);

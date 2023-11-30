@@ -30,19 +30,8 @@ export class AuthController {
 
   @Post('/login')
   @ResponseMessage('Başarıyla giriş yapıldı')
-  async login(
-    @Body() loginDto: LoginDto,
-    @Res({ passthrough: true }) res: Response,
-    // @Req() req: Request,
-  ) {
-    const { access_token, ...user } = await this.authService.login(loginDto);
-    res.cookie('access_token', access_token, {
-      httpOnly: true,
-      secure: true,
-      sameSite: 'none',
-      expires: new Date(Date.now() + 1 * 24 * 60 * 1000),
-    });
-    return user;
+  async login(@Body() loginDto: LoginDto) {
+    return await this.authService.login(loginDto);
   }
 
   @Delete('/logout')
