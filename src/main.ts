@@ -39,7 +39,7 @@ async function bootstrap() {
             }
 
             if (error.children && error.children.length > 0) {
-              const childErrors = formatErrors(error.children, currentPath); // Recursive call
+              const childErrors = formatErrors(error.children, currentPath);
               formattedErrors = formattedErrors.concat(childErrors);
             }
           });
@@ -60,15 +60,13 @@ async function bootstrap() {
     .addTag('BBT')
     .addBearerAuth(
       {
-        // I was also testing it without prefix 'Bearer ' before the JWT
-        description: `[just text field] Please enter token in following format: Bearer <JWT>`,
         name: 'Authorization',
-        bearerFormat: 'Bearer', // I`ve tested not to use this field, but the result was the same
+        bearerFormat: 'Bearer',
         scheme: 'Bearer',
-        type: 'http', // I`ve attempted type: 'apiKey' too
+        type: 'http',
         in: 'Header',
       },
-      'access_token', // This name here is important for matching up with @ApiBearerAuth("access_token") in your controller!
+      'access_token',
     )
     .build();
   const document = SwaggerModule.createDocument(app, config);

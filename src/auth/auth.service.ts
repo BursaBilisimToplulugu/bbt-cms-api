@@ -1,4 +1,8 @@
-import { Injectable, UnauthorizedException } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import * as bcrypt from 'bcrypt';
 import * as jwt from 'jsonwebtoken';
@@ -46,9 +50,17 @@ export class AuthService {
         expiresIn: '1d',
       },
     );
+    const refresh_token = jwt.sign(
+      { email, id: user.id },
+      process.env.JWT_SECRET,
+      {
+        expiresIn: '999d',
+      },
+    );
     const updatedUser = await this.userRepository.save({
       ...user,
       access_token,
+      refresh_token,
     });
     delete updatedUser.password;
     return {
@@ -62,5 +74,25 @@ export class AuthService {
     user.access_token = null;
     await this.userRepository.save(user);
     return { message: 'Logout successful' };
+  }
+
+  async refresh(refresh_token: string) {
+    const decodedRefreshToken = jwt.decode(refresh_token, { json: true });
+    const { id } = decodedRefreshToken;
+    const foundUser = await this.userRepository.findOne({
+      where: { id, refresh_token },
+    });
+    if (!foundUser) throw new BadRequestException('Refresh token is invalid');
+    const newAccessToken = jwt.sign(
+      { email: foundUser.email, id: foundUser.id },
+      process.env.JWT_SECRET,
+      {
+        expiresIn: '1d',
+      },
+    );
+    return await this.userRepository.save({
+      ...foundUser,
+      access_token: newAccessToken,
+    });
   }
 }

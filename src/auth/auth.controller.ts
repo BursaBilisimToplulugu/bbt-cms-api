@@ -42,4 +42,11 @@ export class AuthController {
     await this.authService.logout(user.id);
     res.clearCookie('access_token');
   }
+
+  @Post('/refresh-token')
+  @ResponseMessage('Başarıyla token yenilendi')
+  async refreshToken(@Req() req: Request) {
+    const { refresh_token } = req.headers;
+    return await this.authService.refresh(refresh_token as string);
+  }
 }

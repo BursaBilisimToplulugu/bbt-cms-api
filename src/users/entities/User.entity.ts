@@ -28,6 +28,10 @@ export class User extends BaseEntity {
   @Column({ default: 'user' })
   role: string;
 
+  @Column({ nullable: true })
+  @Exclude({ toPlainOnly: true })
+  refresh_token: string;
+
   @OneToMany(() => Comment, (comment) => comment.user)
   comments: Comment[];
 }

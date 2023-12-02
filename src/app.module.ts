@@ -9,6 +9,7 @@ import { StorageModule } from './storage/storage.module';
 import { User } from './users/entities/User.entity';
 import { UsersModule } from './users/users.module';
 import { CommentModule } from './comment/comment.module';
+import { ProfileModule } from './profile/profile.module';
 
 @Module({
   imports: [
@@ -30,6 +31,7 @@ import { CommentModule } from './comment/comment.module';
     AuthModule,
     StorageModule,
     CommentModule,
+    ProfileModule,
   ],
   controllers: [AppController],
   providers: [AppService],
