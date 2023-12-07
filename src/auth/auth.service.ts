@@ -47,7 +47,7 @@ export class AuthService {
       { email, id: user.id },
       process.env.JWT_SECRET,
       {
-        expiresIn: '1d',
+        expiresIn: '10s',
       },
     );
     const refresh_token = jwt.sign(
@@ -87,7 +87,7 @@ export class AuthService {
       { email: foundUser.email, id: foundUser.id },
       process.env.JWT_SECRET,
       {
-        expiresIn: '1d',
+        expiresIn: '9999d',
       },
     );
     return await this.userRepository.save({
