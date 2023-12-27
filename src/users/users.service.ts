@@ -2,6 +2,7 @@ import { ForbiddenException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import * as bcrypt from 'bcrypt';
 import * as jwt from 'jsonwebtoken';
+import { StorageService } from 'src/storage/storage.service';
 import { Repository } from 'typeorm';
 import { User } from './entities/User.entity';
 
@@ -10,6 +11,7 @@ export class UserService {
   constructor(
     @InjectRepository(User)
     private userRepository: Repository<User>,
+    private storageService: StorageService,
   ) {}
 
   async findAll(): Promise<User[]> {
@@ -56,5 +58,20 @@ export class UserService {
     if (!token) return null;
     const decodedJwt = jwt.decode(token, { json: true });
     return await this.getProfileFromEmail(decodedJwt.email);
+  }
+
+  async updateProfilePicture(user: User, file: Express.Multer.File) {
+    const folderName = await this.storageService.createNewFolder(
+      `profile-pictures/${user.email}`,
+      'profile-pictures',
+    );
+    const url = await this.storageService.save(
+      `${folderName}/${file.originalname}`,
+      'bbt-maps-bucket',
+      file.buffer,
+      [{ mediaId: `${user.email}-${new Date(Date.now()).toISOString()}` }],
+    );
+    user.picture_url = url;
+    return await this.userRepository.save(user);
   }
 }

@@ -4,7 +4,7 @@ import sharp from 'sharp';
 import StorageConfig from './storage.config';
 import { StorageFile } from './types/storage';
 
-export type Buckets = 'bbt-event-photos';
+export type Buckets = 'profile-pictures' | 'place-pictures' | 'bbt-maps-bucket';
 
 @Injectable()
 export class StorageService {

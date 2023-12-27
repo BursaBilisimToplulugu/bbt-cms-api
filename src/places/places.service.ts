@@ -54,7 +54,7 @@ export class PlacesService {
     console.log('uploading photos');
     const folderName = await this.storageService.createNewFolder(
       placeName,
-      'bbt-event-photos',
+      'place-pictures',
     );
     const photosPromise = files.map(async (photo) => {
       const fileBuffer = photo.buffer as ArrayBuffer;

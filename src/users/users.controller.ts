@@ -5,13 +5,26 @@ import {
   Get,
   NotFoundException,
   Param,
+  Patch,
   Post,
   Put,
+  Req,
+  UploadedFile,
   UseGuards,
+  UseInterceptors,
 } from '@nestjs/common';
-import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
+import { FileInterceptor } from '@nestjs/platform-express';
+import {
+  ApiBearerAuth,
+  ApiBody,
+  ApiConsumes,
+  ApiOperation,
+  ApiTags,
+} from '@nestjs/swagger';
+import { Request } from 'express';
 import { AuthGuard } from 'src/auth/guards/Auth.guard';
 import { RoleGuard } from 'src/auth/guards/Role.guard';
+import { GetUserInterceptor } from 'src/common/interceptors/GetUser.interceptor';
 import { User } from './entities/User.entity';
 import { UserService } from './users.service';
 
@@ -27,6 +40,31 @@ export class UsersController {
   @ApiBearerAuth('access_token')
   async findAll(): Promise<User[]> {
     return this.usersService.findAll();
+  }
+
+  @Patch('/update-profile-picture')
+  @UseGuards(AuthGuard)
+  @ApiBearerAuth('access_token')
+  @UseInterceptors(FileInterceptor('file'))
+  @UseInterceptors(GetUserInterceptor)
+  @ApiConsumes('multipart/form-data')
+  @ApiBody({
+    schema: {
+      type: 'object',
+      properties: {
+        file: {
+          type: 'string',
+          format: 'binary',
+        },
+      },
+    },
+  })
+  async updateProfilePicture(
+    @UploadedFile('file') file: Express.Multer.File,
+    @Req() req: Request,
+  ) {
+    const user = req.user as User;
+    return this.usersService.updateProfilePicture(user, file);
   }
 
   @Get(':id')
