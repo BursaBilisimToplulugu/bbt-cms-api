@@ -83,6 +83,11 @@ export class PlacesController {
     return this.placesService.findAll();
   }
 
+  @Get('/search/:query')
+  search(@Param('query') query: string) {
+    return this.placesService.search(query);
+  }
+
   @Get(':id')
   findOne(@Param('id', ParseUUIDPipe) id: string) {
     return this.placesService.findOne(id);

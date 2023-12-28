@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import Fuse from 'fuse.js';
 import sharp from 'sharp';
 import { Buckets, StorageService } from 'src/storage/storage.service';
 import { Repository } from 'typeorm';
@@ -27,6 +28,16 @@ export class PlacesService {
       relations: { photos: true, comments: true },
       order: { created_at: 'DESC' },
     });
+  }
+
+  async search(query: string) {
+    const places = await this.placeRepository.find();
+    const fuse = new Fuse(places, {
+      includeScore: false,
+      keys: ['name'],
+    });
+    const result = fuse.search(query).map((item) => item.item);
+    return result;
   }
 
   async findOne(id: Place['id']) {
