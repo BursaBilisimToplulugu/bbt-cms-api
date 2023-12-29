@@ -31,7 +31,9 @@ export class PlacesService {
   }
 
   async search(query: string) {
-    const places = await this.placeRepository.find();
+    const places = await this.placeRepository.find({
+      relations: { comments: true, photos: true },
+    });
     const fuse = new Fuse(places, {
       includeScore: false,
       keys: ['name'],
