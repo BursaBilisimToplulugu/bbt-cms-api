@@ -60,18 +60,21 @@ export class UserService {
     return await this.getProfileFromEmail(decodedJwt.email);
   }
 
-  async updateProfilePicture(user: User, file: Express.Multer.File) {
-    const folderName = await this.storageService.createNewFolder(
-      `profile-pictures/${user.email}`,
-      'profile-pictures',
-    );
-    const url = await this.storageService.save(
-      `${folderName}/${file.originalname}`,
-      'bbt-maps-bucket',
-      file.buffer,
-      [{ mediaId: `${user.email}-${new Date(Date.now()).toISOString()}` }],
-    );
-    user.picture_url = url;
+  async updateProfilePicture(
+    user: User,
+    // file: Express.Multer.File
+  ) {
+    // const folderName = await this.storageService.createNewFolder(
+    //   `profile-pictures/${user.email}`,
+    //   'profile-pictures',
+    // );
+    // const url = await this.storageService.save(
+    //   `${folderName}/${file.originalname}`,
+    //   'bbt-maps-bucket',
+    //   file.buffer,
+    //   [{ mediaId: `${user.email}-${new Date(Date.now()).toISOString()}` }],
+    // );
+    // user.picture_url = url;
     return await this.userRepository.save(user);
   }
 }

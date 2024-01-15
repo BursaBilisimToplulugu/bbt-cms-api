@@ -75,7 +75,7 @@ export class PlacesController {
     photos: Express.Multer.File[],
     @Body() createPlaceDto: CreatePlaceDto,
   ) {
-    return await this.placesService.create(createPlaceDto, photos);
+    return await this.placesService.create(createPlaceDto);
   }
 
   @Get()

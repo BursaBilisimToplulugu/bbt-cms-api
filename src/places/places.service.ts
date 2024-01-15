@@ -1,8 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import Fuse from 'fuse.js';
-import sharp from 'sharp';
-import { Buckets, StorageService } from 'src/storage/storage.service';
+import { StorageService } from 'src/storage/storage.service';
 import { Repository } from 'typeorm';
 import { CreatePlaceDto } from './dto/create-place.dto';
 import { UpdatePlaceDto } from './dto/update-place.dto';
@@ -15,10 +14,13 @@ export class PlacesService {
     private storageService: StorageService,
   ) {}
 
-  async create({ ...payload }: CreatePlaceDto, photos: Express.Multer.File[]) {
-    const photoUrls = await this.uploadPhotos(photos, payload.name);
+  async create(
+    { ...payload }: CreatePlaceDto,
+    // photos: Express.Multer.File[]
+  ) {
+    // const photoUrls = await this.uploadPhotos(photos, payload.name);
     return this.placeRepository.save({
-      photos: photoUrls.map((url) => ({ url })),
+      // photos: photoUrls.map((url) => ({ url })),
       ...payload,
     });
   }
@@ -63,34 +65,34 @@ export class PlacesService {
     return this.placeRepository.delete({ id });
   }
 
-  async uploadPhotos(files: Express.Multer.File[], placeName: Place['name']) {
-    console.log('uploading photos');
-    const folderName = await this.storageService.createNewFolder(
-      placeName,
-      'place-pictures',
-    );
-    const photosPromise = files.map(async (photo) => {
-      const fileBuffer = photo.buffer as ArrayBuffer;
-      const photoObj = {
-        path: `${folderName}/${photo.originalname}`,
-        bucket: 'bbt-maps-bucket' as Buckets,
-        media: fileBuffer,
-        metadata: [
-          { mediaId: `${placeName}-${new Date(Date.now()).toISOString()}` },
-        ],
-      };
-      const pipeline = sharp(fileBuffer);
-      photoObj.media = await pipeline
-        .resize()
-        .jpeg({ quality: 60, progressive: true })
-        .withMetadata()
-        .toBuffer();
+  // async uploadPhotos(files: Express.Multer.File[], placeName: Place['name']) {
+  //   console.log('uploading photos');
+  //   const folderName = await this.storageService.createNewFolder(
+  //     placeName,
+  //     'place-pictures',
+  //   );
+  //   const photosPromise = files.map(async (photo) => {
+  //     const fileBuffer = photo.buffer as ArrayBuffer;
+  //     const photoObj = {
+  //       path: `${folderName}/${photo.originalname}`,
+  //       bucket: 'bbt-maps-bucket' as Buckets,
+  //       media: fileBuffer,
+  //       metadata: [
+  //         { mediaId: `${placeName}-${new Date(Date.now()).toISOString()}` },
+  //       ],
+  //     };
+  //     const pipeline = sharp(fileBuffer);
+  //     photoObj.media = await pipeline
+  //       .resize()
+  //       .jpeg({ quality: 60, progressive: true })
+  //       .withMetadata()
+  //       .toBuffer();
 
-      return photoObj;
-    });
-    const photoObjects = await Promise.all(photosPromise);
-    console.log('got photo objects');
-    const photoURLs = await this.storageService.saveMultiple(photoObjects);
-    return photoURLs;
-  }
+  //     return photoObj;
+  //   });
+  //   const photoObjects = await Promise.all(photosPromise);
+  //   // console.log('got photo objects');
+  //   // const photoURLs = await this.storageService.saveMultiple(photoObjects);
+  //   // return photoURLs;
+  // }
 }
